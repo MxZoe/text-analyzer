@@ -3,10 +3,17 @@ function noInputtedWord(word, text) {
   return ((text.trim().length === 0) || (word.trim().length === 0));
 }
 
+function noInputtedText(text){
+    return text.trim().length === 0;
+}
+
+function wordMatch(wordOne, wordTwo) {
+  return wordOne.toLowerCase().includes(wordOne.toLowerCase()) && wordOne.toLowerCase() === wordTwo.toLowerCase()
+}
 //business logic
 
 function wordCounter(text){
-  if(text.trim().length === 0){
+  if(noInputtedText(text)){
     return 0;
   }
   let wordCount = 0;
@@ -25,12 +32,12 @@ function numberOfOccurrencesInText(word, text){
   }
   const wordArray = text.split(" ");
   let wordCount = 0;
-  for(let i = 0; i < wordArray.length; i++){
-    if(wordArray[i].toLowerCase().includes(word.toLowerCase())) {
+  wordArray.forEach(function(element) {
+    if(wordMatch(element, word)) {
       wordCount++;
     }
-  };
-    return wordCount;
+  });
+      return wordCount;
 }
 
 function boldPassage(word, text) {
@@ -40,7 +47,7 @@ function boldPassage(word, text) {
   let htmlString = "<p>";
   let textArray = text.split(" ");
   textArray.forEach(function(element, index) {
-    if (element.toLowerCase().includes(word.toLowerCase())) {
+    if (wordMatch(element, word)) {
       htmlString = htmlString.concat("<b>" + element + "</b>");
     } else {
       htmlString = htmlString.concat(element);
@@ -51,19 +58,56 @@ function boldPassage(word, text) {
   });
   return htmlString + "</p>";
 }
-
+function topThreeWords(text){
+  if(noInputtedText(text)){
+    return 0;
+  }
+  let wordArray = text.split(" ");
+  let countSentence = "";
+  let topmost = 0;
+  let topmostWord = "";
+  let secondMost = 0;
+  let secondWord = "";
+  let thirdMost = 0;
+  let thirdWord = "";
+  let result = "";
+  wordArray.forEach(function(element){
+    if(countSentence.toLowerCase().includes(element.toLowerCase())){
+      return
+    }
+    let numberOfTimes = numberOfOccurrencesInText(element, text);
+    if(numberOfTimes > topmost){
+      topmost = numberOfTimes;
+      topmostWord = element;
+    } else if(numberOfTimes > secondMost){
+      secondMost = numberOfTimes;
+      secondWord = element;
+    } else if(numberOfTimes > thirdMost){
+      thirdMost = numberOfTimes;
+      thirdWord = element;
+    }
+    
+    result = "<br>" + topmostWord + " " + topmost + "<br>" + secondWord + " " + secondMost + "<br>" + thirdWord + " " +thirdMost;
+    countSentence = countSentence.concat(result);
+  });
+  
+  return result;
+}
 
 // UI Logic
 
 $(document).ready(function(){
   $("form#word-counter").submit(function(event){
-    event.preventDefault();
+    
     let passage = $("#text-passage").val();
     let word = $("#word").val();
     let wordCount = wordCounter(passage);
     let occurrencesOfWord = numberOfOccurrencesInText(word, passage);
+    let topWord = topThreeWords(passage);
     $("#total-count").html(wordCount);
     $("#selected-count").html(occurrencesOfWord);
     $("#bolded-passage").html(boldPassage(word, passage));
+    $("#topWord").html(topWord);
+    event.preventDefault();
   });
 });
