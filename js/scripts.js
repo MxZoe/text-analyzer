@@ -76,7 +76,9 @@ function topThreeWords(text){
   if(noInputtedText(text)){
     return 0;
   }
-  let wordArray = text.split(" ");
+  const noPunctuation = removePunctuation(text);
+  let wordArray = noPunctuation.split(" ");
+  
   let countSentence = "";
   let topmost = 0;
   let topmostWord = "";
